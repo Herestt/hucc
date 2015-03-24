@@ -12,8 +12,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.herestt.tos.util.FileContent;
-
 /**
  * Utility class for handling a sequence of data within a file.
  * 
@@ -21,7 +19,7 @@ import com.herestt.tos.util.FileContent;
  *
  */
 public class FileContent {
-
+	
 	/** The created channel that accesses the current file. */
 	private static SeekableByteChannel sbc = null;
 		
@@ -216,8 +214,12 @@ public class FileContent {
 		 * @throws IOException - If an I/O error occurs.
 		 */
 		public ByteBuffer asByteBuffer(int capacity) throws IOException {
-			// TODO - Herestt.
-			return null;
+			if(capacity < 0)
+				throw new IllegalArgumentException();
+			ByteBuffer buffer = ByteBuffer.allocateDirect(capacity).order(order);
+			sbc.read(buffer);
+			buffer.rewind();
+			return buffer;
 		}
 		
 		/**
@@ -227,8 +229,8 @@ public class FileContent {
 		 * @throws IOException - If an I/O error occurs.
 		 */
 		public boolean asBoolean() throws IOException {
-			// TODO - Herestt.
-			return false;
+			ByteBuffer bb = asByteBuffer(1);
+			return (bb.get() == 0)? false : true;
 		}
 		
 		/**
@@ -238,8 +240,8 @@ public class FileContent {
 		 * @throws IOException - If an I/O error occurs.
 		 */
 		public char asChar() throws IOException {
-			// TODO - Herestt.
-			return '0';
+			ByteBuffer bb = asByteBuffer(Character.SIZE / 8);
+			return bb.getChar();
 		}
 		
 		/**
@@ -249,8 +251,8 @@ public class FileContent {
 		 * @throws IOException - If an I/O error occurs.
 		 */
 		public short asShort() throws IOException {
-			// TODO - Herestt.
-			return 0;
+			ByteBuffer bb = asByteBuffer(Short.SIZE / 8);
+			return bb.getShort();
 		}
 		
 		/**
@@ -260,8 +262,8 @@ public class FileContent {
 		 * @throws IOException - If an I/O error occurs.
 		 */
 		public int asUnsignedShort() throws IOException {
-			// TODO - Herestt.
-			return 0;
+			int val = asShort();
+			return val & 0x0000FFFF;
 		}
 		
 		/**
@@ -271,8 +273,8 @@ public class FileContent {
 		 * @throws IOException - If an I/O error occurs.
 		 */
 		public int asInt() throws IOException {
-			// TODO - Herestt.
-			return 0;
+			ByteBuffer bb = asByteBuffer(Integer.SIZE / 8);
+			return bb.getInt();
 		}
 		
 		/**
@@ -282,8 +284,8 @@ public class FileContent {
 		 * @throws IOException - If an I/O error occurs.
 		 */
 		public long asUnsignedInt() throws IOException {
-			// TODO - Herestt.
-			return 0;
+			long val = asInt();
+			return val & 0x00000000FFFFFFFFL;
 		}
 		
 		/**
@@ -293,8 +295,8 @@ public class FileContent {
 		 * @throws IOException - If an I/O error occurs.
 		 */
 		public long asLong() throws IOException {
-			// TODO - Herestt.
-			return 0;
+			ByteBuffer bb = asByteBuffer(Long.SIZE / 8);
+			return bb.getLong();
 		}
 		
 		/**
@@ -305,8 +307,10 @@ public class FileContent {
 		 * @throws IOException - If an I/O error occurs.
 		 */
 		public String asString(int length) throws IOException {
-			// TODO - Herestt.
-			return null;
+			ByteBuffer bb = asByteBuffer(length);
+			byte[] s = new byte[length];
+			bb.get(s);
+			return new String(s, "UTF-8").trim();
 		}
 		
 		/**
@@ -317,9 +321,12 @@ public class FileContent {
 		 * @return The read string.
 		 * @throws IOException - If an I/O error occurs.
 		 */
-		public String asXorString(int length, int key) {
-			// TODO - Herestt.
-			return null;
+		public String asXorString(int length, int key) throws IOException {
+			StringBuilder sb = new StringBuilder();
+			String s = asString(length);
+			for(byte b : s.getBytes())
+				sb.append((char) ((b ^ key) & 0xFF));
+			return sb.toString();
 		}
 	}
 	
