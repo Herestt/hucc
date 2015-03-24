@@ -4,8 +4,15 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.SeekableByteChannel;
+import java.nio.file.FileSystem;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
+import com.herestt.tos.util.FileContent;
 
 /**
  * Utility class for handling a sequence of data within a file.
@@ -22,7 +29,7 @@ public class FileContent {
 	private static ByteOrder order = null;
 	
 	/** Allows a direct access to the basic function of this utility class.  */
-	private static Surrogate accessor = null;
+	private static Surrogate surrogate = null;
 	
 	/** Gives a bunch of function that allows to read data from the accessed file. */
 	private static Reader reader = null;
@@ -31,6 +38,22 @@ public class FileContent {
 	private static Writer writer = null;
 	
 	private FileContent() {}
+	
+	private static <T extends OpenOption> SeekableByteChannel loadByteChannel(Path path, OpenOption... options) {
+		try {
+			FileSystem fs = path.getFileSystem();
+			Set<OpenOption> set = new HashSet<>(options.length);
+			Collections.addAll(set, options);
+			if(!set.contains(StandardOpenOption.WRITE)
+					|| !set.contains(StandardOpenOption.APPEND)
+					&& !set.contains(StandardOpenOption.READ))
+				set.add(StandardOpenOption.READ);
+			sbc = fs.provider().newByteChannel(path, set);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return sbc;
+	}
 	
 	/**
 	 * The first function to call so as to access a file.
@@ -42,8 +65,12 @@ public class FileContent {
 	 * @return The {@link SeekableByteChannel} used for accessing the file.
 	 */
 	public static SeekableByteChannel access(Path path, long position, OpenOption... options) {
-		// TODO - Herestt.
-		return null;
+		loadByteChannel(path, options);
+		order = ByteOrder.BIG_ENDIAN;
+		surrogate = new Surrogate();
+		reader = new Reader();
+		writer = new Writer();
+		return sbc;
 	}
 	
 	/**
@@ -52,8 +79,7 @@ public class FileContent {
 	 * @return The class containing reading functions.
 	 */
 	public static Reader read() {
-		// TODO - Herestt.
-		return null;
+		return surrogate.read();
 	}
 		
 	/**
@@ -62,8 +88,7 @@ public class FileContent {
 	 * @return The class containing writing functions. 
 	 */
 	public static Writer write() {
-		// TODO - Herestt.
-		return null;
+		return surrogate.write();
 	}
 	
 	/**
@@ -74,8 +99,8 @@ public class FileContent {
 	 * @throws IOException - If I/O exception occurs.
 	 */
 	public static Surrogate position(long newPosition) throws IOException {
-		// TODO - Herestt.
-		return null;
+		surrogate.position(newPosition);
+		return surrogate;
 	}
 	
 	/**
@@ -86,8 +111,8 @@ public class FileContent {
 	 * @throws IOException - If I/O exception occurs.
 	 */
 	public static Surrogate skip(long count) throws IOException {
-		// TODO - Herestt.
-		return null;
+		surrogate.skip(count);
+		return surrogate;
 	}
 	
 	/**
@@ -97,8 +122,8 @@ public class FileContent {
 	 * @return A surrogate class that allows the usage of other file handling functions.
 	 */
 	public static Surrogate order(ByteOrder order) {
-		// TODO - Herestt.
-		return null;
+		surrogate.order(order);
+		return surrogate;
 	}
 	
 	/**
@@ -110,14 +135,17 @@ public class FileContent {
 	 */
 	public static class Surrogate {
 		
+		private Surrogate() {}
+		
 		/**
 		 * Access the reader utility.
 		 *  
 		 * @return The class containing reading functions.
 		 */
 		public Reader read() {
-			// TODO - Herestt.
-			return null;
+			if(reader == null)
+				throw new NullPointerException("The file content helper must be initialized by calling the access method first.");
+			return reader;
 		}
 		
 		/**
@@ -126,8 +154,9 @@ public class FileContent {
 		 * @return The class containing writing functions.
 		 */
 		public Writer write() {
-			// TODO - Herestt.
-			return null;
+			if(writer == null)
+				throw new NullPointerException("The file content helper must be initialized by calling the access method first.");
+			return writer;
 		}
 		
 		/**
@@ -138,8 +167,10 @@ public class FileContent {
 		 * @throws IOException - If I/O exception occurs.
 		 */
 		public Surrogate position(long newPosition) throws IOException {
-			// TODO - Herestt.
-			return null;
+			if(newPosition < 0 || newPosition >= sbc.size())
+				throw new IllegalArgumentException();
+			sbc.position(newPosition);
+			return this;
 		}
 		
 		/**
@@ -150,8 +181,9 @@ public class FileContent {
 		 * @throws IOException - If I/O exception occurs.
 		 */
 		public Surrogate skip(long count) throws IOException {
-			// TODO - Herestt.
-			return null;
+			long newPosition = sbc.position() + count;
+			position(newPosition);
+			return this;
 		}
 		
 		/**
@@ -161,8 +193,8 @@ public class FileContent {
 		 * @return A surrogate class that allows the usage of other file handling functions.
 		 */
 		public Surrogate order(ByteOrder order) {
-			// TODO - Herestt.
-			return null;
+			FileContent.order = order;
+			return this;
 		}
 	}
 	
