@@ -206,6 +206,15 @@ public class FileContent {
 		
 		private Reader() {}
 		
+		public byte[] asBytes(int capacity) throws IOException {
+			if(capacity < 0)
+				throw new IllegalArgumentException();
+			ByteBuffer buffer = ByteBuffer.allocate(capacity).order(order);
+			sbc.read(buffer);
+			buffer.rewind();
+			return buffer.array();
+		}
+		
 		/**
 		 * Reads the amount of bytes given by the capacity of the buffer that will contain them.
 		 * 
