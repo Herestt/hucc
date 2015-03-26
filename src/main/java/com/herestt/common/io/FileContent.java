@@ -73,6 +73,15 @@ public class FileContent {
 		return sbc;
 	}
 	
+	public static void access(SeekableByteChannel sbc, long position) throws IOException {
+		FileContent.sbc = sbc;
+		order = ByteOrder.BIG_ENDIAN;
+		surrogate = new Surrogate();
+		reader = new Reader();
+		writer = new Writer();
+		position(position);
+	}
+	
 	/**
 	 * Access the reader utility.
 	 *  
