@@ -61,13 +61,15 @@ public class FileContent {
 	 * @param options The options that will be passes to the 
 	 * 		@see {@link java.nio.file.spi.FileSystemProvider#newByteChannel(Path, java.util.Set, java.nio.file.attribute.FileAttribute...)}
 	 * @return The {@link SeekableByteChannel} used for accessing the file.
+	 * @throws IOException 
 	 */
-	public static SeekableByteChannel access(Path path, long position, OpenOption... options) {
+	public static SeekableByteChannel access(Path path, long position, OpenOption... options) throws IOException {
 		loadByteChannel(path, options);
 		order = ByteOrder.BIG_ENDIAN;
 		surrogate = new Surrogate();
 		reader = new Reader();
 		writer = new Writer();
+		position(position);
 		return sbc;
 	}
 	
