@@ -124,6 +124,13 @@ public class FileContent {
 		return surrogate;
 	}
 	
+	/**
+	 * Skips bytes until finding a specific character.
+	 * 
+	 * @param c The character to reach. 
+	 * @return a surrogate class that allows the usage of the other file handling fuctions. 
+	 * @throws IOException - if an I/O error occurs.
+	 */
 	public static Surrogate skip(char c) throws IOException {
 		surrogate.skip(c);
 		return surrogate;
@@ -328,6 +335,18 @@ public class FileContent {
 		public long asLong() throws IOException {
 			ByteBuffer bb = asByteBuffer(Long.SIZE / 8);
 			return bb.getLong();
+		}
+		
+		/**
+		 * Reads the four next bytes as a float.
+		 * 
+		 * @return the read value;
+		 * 
+		 * @throws IOException - if an I/O error occurs.
+		 */
+		public float asFloat() throws IOException {
+			ByteBuffer bb = asByteBuffer(Float.SIZE / 8);
+			return bb.getFloat();
 		}
 		
 		/**
