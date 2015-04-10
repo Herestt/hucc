@@ -124,6 +124,11 @@ public class FileContent {
 		return surrogate;
 	}
 	
+	public static Surrogate skip(char c) throws IOException {
+		surrogate.skip(c);
+		return surrogate;
+	}
+	
 	/**
 	 * Sets the byte order with which each element will be handled.
 	 * 
@@ -192,6 +197,12 @@ public class FileContent {
 		public Surrogate skip(long count) throws IOException {
 			long newPosition = sbc.position() + count;
 			position(newPosition);
+			return this;
+		}
+		
+		public Surrogate skip(char c) throws IOException {
+			while(c != reader.asChar())
+				skip(-1);
 			return this;
 		}
 		
