@@ -357,10 +357,23 @@ public class FileContent {
 		 * @throws IOException - If an I/O error occurs.
 		 */
 		public String asString(int length) throws IOException {
+			return asString(length, "UTF-8");
+		}
+		
+		/**
+		 * Reads the next bytes as an String.
+		 * 
+		 * @param length The amount of bytes that compose the string.
+		 * @param charsetName The name of a supported {@linkplain java.nio.charset.Charset
+		 *       charset}
+		 * @return The read string.
+		 * @throws IOException - If an I/O error occurs.
+		 */
+		public String asString(int length, String charsetName) throws IOException {
 			ByteBuffer bb = asByteBuffer(length);
 			byte[] s = new byte[length];
 			bb.get(s);
-			return new String(s, "UTF-8").trim();
+			return new String(s, charsetName).trim();
 		}
 		
 		/**
@@ -372,8 +385,22 @@ public class FileContent {
 		 * @throws IOException - If an I/O error occurs.
 		 */
 		public String asXorString(int length, int key) throws IOException {
+			return asXorString(length, key, "UTF-8");
+		}
+		
+		/**
+		 * Reads the next bytes as an XOR encoded string.
+		 * 
+		 * @param length The amount of bytes that compose the XOR string.
+		 * @param key The key to decode each byte.
+		 * @param charsetName The name of a supported {@linkplain java.nio.charset.Charset
+		 *       charset}
+		 * @return The read string.
+		 * @throws IOException - If an I/O error occurs.
+		 */
+		public String asXorString(int length, int key, String charsetName) throws IOException {
 			StringBuilder sb = new StringBuilder();
-			String s = asString(length);
+			String s = asString(length, charsetName);
 			for(byte b : s.getBytes())
 				sb.append((char) ((b ^ key) & 0xFF));
 			return sb.toString();
