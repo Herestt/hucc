@@ -22,17 +22,23 @@ import java.util.Set;
  */
 public class FileContentChannel extends FileChannel
 		implements NativeConvertibleChannel<FileContentChannel>, SkippableChannel<FileContentChannel> {
-
+	
+	private FileChannel channel;
+	
+	private FileContentChannel(FileChannel channel) {
+		
+	}
+	
 	public static FileContentChannel open(Path path, Set<? extends OpenOption> options,
             FileAttribute<?>... attrs) throws IOException {
-		// TODO - Herestt : implementation.
-		return null;
+		FileChannel channel = FileChannel.open(path, options, attrs);
+		return new FileContentChannel(channel);
 	}
 	
 	 public static FileContentChannel open(Path path, OpenOption... options)
 		        throws IOException {
-		 // TODO - Herestt : implementation.
-		 return null;
+		 FileChannel channel = FileChannel.open(path, options);
+		return new FileContentChannel(channel);
 	}
 	 
 	@Override
