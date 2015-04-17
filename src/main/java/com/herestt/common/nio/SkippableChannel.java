@@ -1,5 +1,6 @@
 package com.herestt.common.nio;
 
+import java.io.IOException;
 import java.nio.channels.FileChannel;
 
 /**
@@ -18,48 +19,55 @@ public interface SkippableChannel<E extends FileChannel> {
 	 * 
 	 * @param count - the amount of bytes to skip.
 	 * @return the current {@link FileChannel} instance.
+	 * @throws IOException 
 	 */
-	public E skip(long count);
+	public E skip(long count) throws IOException;
 	
 	/**
 	 * Skips a byte.
 	 * 
 	 * @return the current {@link FileChannel} instance.
+	 * @throws IOException 
 	 */
-	public E skipByte();
+	public E skipByte() throws IOException;
 	
 	/**
 	 * Skips a size of a boolean in bytes.
 	 * 
 	 * @return the current {@link FileChannel} instance.
+	 * @throws IOException 
 	 */
-	public E skipBoolean();
+	public E skipBoolean() throws IOException;
 	
 	/**
 	 * Skips {@link Short#BYTES} bytes.
 	 * 
 	 * @return the current {@link FileChannel} instance.
+	 * @throws IOException 
 	 */
-	public E skipChar();
+	public E skipChar() throws IOException;
 	
 	/**
 	 * Skips {@link Integer#BYTES} bytes.
 	 * 
 	 * @return the current {@link FileChannel} instance.
+	 * @throws IOException 
 	 */
-	public E skipInt();
+	public E skipInt() throws IOException;
 	
 	/**
 	 * Skips {@link Long#BYTES} bytes.
 	 * 
 	 * @return the current {@link FileChannel} instance.
+	 * @throws IOException 
 	 */
-	public E skipLong();
+	public E skipLong() throws IOException;
 	
 	/**
 	 * Skips {@link Float#BYTES} bytes.
 	 * 
 	 * @return the current {@link FileChannel} instance.
+	 * @throws IOException 
 	 */
-	public E skipFloat();
+	public E skipFloat() throws IOException;
 }
