@@ -152,14 +152,13 @@ public class FileContentChannel extends FileChannel
 
 	@Override
 	public FileContentChannel order(ByteOrder order) {
-		// TODO Auto-generated method stub
-		return null;
+		this.order = order;
+		return this;
 	}
 
 	@Override
 	public ByteOrder order() {
-		// TODO Auto-generated method stub
-		return null;
+		return order;
 	}
 	
 	@Override
