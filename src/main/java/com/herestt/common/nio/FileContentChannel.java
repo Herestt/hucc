@@ -12,6 +12,7 @@ import java.nio.charset.Charset;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileAttribute;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -25,8 +26,10 @@ public class FileContentChannel extends FileChannel
 	
 	private FileChannel channel;
 	
+	private ByteOrder order = ByteOrder.BIG_ENDIAN;
+	
 	private FileContentChannel(FileChannel channel) {
-		
+		this.channel = channel;
 	}
 	
 	public static FileContentChannel open(Path path, Set<? extends OpenOption> options,
@@ -37,117 +40,114 @@ public class FileContentChannel extends FileChannel
 	
 	 public static FileContentChannel open(Path path, OpenOption... options)
 		        throws IOException {
-		 FileChannel channel = FileChannel.open(path, options);
+		FileChannel channel = FileChannel.open(path, options);
 		return new FileContentChannel(channel);
 	}
-	 
+	
 	@Override
 	public int read(ByteBuffer dst) throws IOException {
-		// TODO Auto-generated method stub
-		return 0;
+		return read(dst, 0);
 	}
 
 	@Override
 	public long read(ByteBuffer[] dsts, int offset, int length)
 			throws IOException {
-		// TODO Auto-generated method stub
-		return 0;
+		for(ByteBuffer bb : dsts) {
+			Objects.requireNonNull(bb);
+			bb.order(order);
+		}
+		return channel.read(dsts, offset, length);
 	}
 
 	@Override
 	public int write(ByteBuffer src) throws IOException {
-		// TODO Auto-generated method stub
-		return 0;
+		return write(src, 0);
 	}
 
 	@Override
 	public long write(ByteBuffer[] srcs, int offset, int length)
 			throws IOException {
-		// TODO Auto-generated method stub
-		return 0;
+		for(ByteBuffer bb : srcs) {
+			Objects.requireNonNull(bb);
+			bb.order(order);
+		}
+		return channel.write(srcs, offset, length);
 	}
 
 	@Override
 	public long position() throws IOException {
-		// TODO Auto-generated method stub
-		return 0;
+		return channel.position();
 	}
 
 	@Override
 	public FileChannel position(long newPosition) throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+		return channel.position(newPosition);
 	}
 
 	@Override
 	public long size() throws IOException {
-		// TODO Auto-generated method stub
-		return 0;
+		return channel.size();
 	}
 
 	@Override
 	public FileChannel truncate(long size) throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+		return channel.truncate(size);
 	}
 
 	@Override
 	public void force(boolean metaData) throws IOException {
-		// TODO Auto-generated method stub
+		channel.force(metaData);
 		
 	}
 
 	@Override
 	public long transferTo(long position, long count, WritableByteChannel target)
 			throws IOException {
-		// TODO Auto-generated method stub
-		return 0;
+		return channel.transferTo(position, count, target);
 	}
 
 	@Override
 	public long transferFrom(ReadableByteChannel src, long position, long count)
 			throws IOException {
-		// TODO Auto-generated method stub
-		return 0;
+		return channel.transferFrom(src, position, count);
 	}
 
 	@Override
 	public int read(ByteBuffer dst, long position) throws IOException {
-		// TODO Auto-generated method stub
-		return 0;
+		Objects.requireNonNull(dst);
+		dst.order(order);
+		return channel.read(dst, position);
 	}
 
 	@Override
 	public int write(ByteBuffer src, long position) throws IOException {
-		// TODO Auto-generated method stub
-		return 0;
+		Objects.requireNonNull(src);
+		src.order(order);
+		return channel.write(src, position);
 	}
 
 	@Override
 	public MappedByteBuffer map(MapMode mode, long position, long size)
 			throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+		return channel.map(mode, position, size);
 	}
 
 	@Override
 	public FileLock lock(long position, long size, boolean shared)
 			throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+		return channel.lock(position, size, shared);
 	}
 
 	@Override
 	public FileLock tryLock(long position, long size, boolean shared)
 			throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+		return channel.tryLock(position, size, shared);
 	}
 
 	@Override
 	protected void implCloseChannel() throws IOException {
-		// TODO Auto-generated method stub
-		
+		if(channel != null)
+			channel.close();
 	}
 
 	@Override
