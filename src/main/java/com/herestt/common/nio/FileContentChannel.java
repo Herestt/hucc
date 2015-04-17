@@ -330,44 +330,44 @@ public class FileContentChannel extends FileChannel
 	}
 
 	@Override
-	public FileContentChannel skip(long count) {
-		// TODO Auto-generated method stub
-		return null;
+	public FileContentChannel skip(long count) throws IOException {
+		channel.position(channel.position() + count);
+		return this;
 	}
 
 	@Override
-	public FileContentChannel skipByte() {
-		// TODO Auto-generated method stub
-		return null;
+	public FileContentChannel skipByte() throws IOException {
+		skip(Byte.BYTES);
+		return this;
 	}
 
 	@Override
-	public FileContentChannel skipBoolean() {
-		// TODO Auto-generated method stub
-		return null;
+	public FileContentChannel skipBoolean() throws IOException {
+		skip(1);
+		return this;
 	}
 
 	@Override
-	public FileContentChannel skipChar() {
-		// TODO Auto-generated method stub
-		return null;
+	public FileContentChannel skipChar() throws IOException {
+		skip(Character.BYTES);
+		return this;
 	}
 
 	@Override
-	public FileContentChannel skipInt() {
-		// TODO Auto-generated method stub
-		return null;
+	public FileContentChannel skipInt() throws IOException {
+		skip(Integer.BYTES);
+		return this;
 	}
 
 	@Override
-	public FileContentChannel skipLong() {
-		// TODO Auto-generated method stub
-		return null;
+	public FileContentChannel skipLong() throws IOException {
+		skip(Long.BYTES);
+		return this;
 	}
 
 	@Override
-	public FileContentChannel skipFloat() {
-		// TODO Auto-generated method stub
-		return null;
+	public FileContentChannel skipFloat() throws IOException {
+		skip(Float.BYTES);
+		return this;
 	}
 }
