@@ -188,7 +188,7 @@ public class FileContent {
 		 * @throws IOException - If I/O exception occurs.
 		 */
 		public Surrogate position(long newPosition) throws IOException {
-			if(newPosition < 0 || newPosition >= sbc.size())
+			if(newPosition < 0 || newPosition > sbc.size())
 				throw new IllegalArgumentException();
 			sbc.position(newPosition);
 			return this;
