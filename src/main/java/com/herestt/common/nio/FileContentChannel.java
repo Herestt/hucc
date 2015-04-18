@@ -46,7 +46,9 @@ public class FileContentChannel extends FileChannel
 	
 	@Override
 	public int read(ByteBuffer dst) throws IOException {
-		return read(dst, 0);
+		Objects.requireNonNull(dst);
+		dst.order(order);
+		return channel.read(dst);
 	}
 
 	@Override
@@ -161,170 +163,175 @@ public class FileContentChannel extends FileChannel
 		return order;
 	}
 	
+	private ByteBuffer read(int length) throws IOException {
+		if(length < 0)
+			throw new IllegalArgumentException();
+		ByteBuffer dst = ByteBuffer.allocateDirect(length);
+		while(dst.hasRemaining())
+			read(dst);
+		dst.flip();
+		return dst;
+	}
+	
 	@Override
-	public int readUShort() {
-		// TODO Auto-generated method stub
-		return 0;
+	public int readUShort() throws IOException {
+		int val = readShort();
+		return val & 0x0000FFFF;
 	}
 
 	@Override
-	public long readUInt() {
-		// TODO Auto-generated method stub
-		return 0;
+	public long readUInt() throws IOException {
+		long val = readInt();
+		return val & 0x00000000FFFFFFFFL;
 	}
 
 	@Override
-	public void writeUShort(int s) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void writeUInt(long l) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public byte readByte() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public boolean readBoolean() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public short readShort() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public int readInt() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public long readLong() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public float readFloat() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public double readDouble() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public char readChar() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public String readString(int length) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String readString(int length, Charset charset) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String readXorString(int length, int key) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String readXorString(int length, int key, Charset charset) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void writeByte(byte b) {
+	public void writeUShort(int s) throws IOException {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void writeBoolean(boolean b) {
+	public void writeUInt(long l) throws IOException {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	@Override
+	public byte readByte() throws IOException {
+		return read(Byte.BYTES).get();
+	}
+
+	@Override
+	public boolean readBoolean() throws IOException {
+		return (read(Byte.BYTES).get() == 0)? false : true;
+	}
+
+	@Override
+	public short readShort() throws IOException {
+		return read(Short.BYTES).getShort();
+	}
+
+	@Override
+	public int readInt() throws IOException {
+		return read(Integer.BYTES).getInt();
+	}
+
+	@Override
+	public long readLong() throws IOException {
+		return read(Long.BYTES).getLong();
+	}
+
+	@Override
+	public float readFloat() throws IOException {
+		return read(Float.BYTES).getFloat();
+	}
+
+	@Override
+	public double readDouble() throws IOException {
+		return read(Double.BYTES).getDouble();
+	}
+
+	@Override
+	public char readChar() throws IOException {
+		return read(Character.BYTES).getChar();
+	}
+
+	@Override
+	public String readString(int length) throws IOException {
+		return readString(length, Charset.forName("UTF-8"));
+	}
+
+	@Override
+	public String readString(int length, Charset charset) throws IOException {
+		ByteBuffer bb = read(length);
+		byte[] bytes = new byte[length];
+		bb.get(bytes);
+		return new String(bytes, charset).trim();
+	}
+
+	@Override
+	public String readXorString(int length, int key) throws IOException {
+		return readXorString(length, key, Charset.forName("UTF-8"));
+	}
+
+	@Override
+	public String readXorString(int length, int key, Charset charset) throws IOException {
+		StringBuilder sb = new StringBuilder();
+		String s = readString(length, charset);
+		for(byte b : s.getBytes())
+			sb.append((char) ((b ^ key) & 0xFF));
+		return sb.toString();
+	}
+
+	@Override
+	public void writeByte(byte b) throws IOException {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void writeShort(short s) {
+	public void writeBoolean(boolean b) throws IOException {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void writeInt(int i) {
+	public void writeShort(short s) throws IOException {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void writeLong(long l) {
+	public void writeInt(int i) throws IOException {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void writeFloat(float f) {
+	public void writeLong(long l) throws IOException {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void writeDouble(double d) {
+	public void writeFloat(float f) throws IOException {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void writeChar(char c) {
+	public void writeDouble(double d) throws IOException {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void writeString(String s) {
+	public void writeChar(char c) throws IOException {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void writeString(String s, Charset charset) {
+	public void writeString(String s) throws IOException {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void writeXorString(String s, int key) {
+	public void writeString(String s, Charset charset) throws IOException {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void writeXorString(String s, int key, Charset charset) {
+	public void writeXorString(String s, int key) throws IOException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void writeXorString(String s, int key, Charset charset) throws IOException {
 		// TODO Auto-generated method stub
 		
 	}

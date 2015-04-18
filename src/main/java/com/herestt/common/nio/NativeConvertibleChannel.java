@@ -1,5 +1,6 @@
 package com.herestt.common.nio;
 
+import java.io.IOException;
 import java.nio.channels.FileChannel;
 
 /**
@@ -19,26 +20,26 @@ public interface NativeConvertibleChannel<E extends FileChannel>
 	 * 
 	 * @return the wrapped short value. 
 	 */
-	public int readUShort();
+	public int readUShort() throws IOException;
 	
 	/**
 	 * Reads the next bytes as an unsigned integer and wrap them into a long.
 	 *  
 	 * @return the wrapped integer value.
 	 */
-	public long readUInt();
+	public long readUInt() throws IOException;
 	
 	/**
 	 * Writes the given value as it was an unsigned short wrapped into an integer.
 	 * 
 	 * @param s - the integer wrapping the short value.
 	 */
-	public void writeUShort(int s);
+	public void writeUShort(int s) throws IOException;
 	
 	/**
 	 * Writes the given value as it was an unsigned integer wrapped into a long.
 	 * 
 	 * @param l - the long wrapping the integer value. 
 	 */
-	public void writeUInt(long l);
+	public void writeUInt(long l) throws IOException;
 }
