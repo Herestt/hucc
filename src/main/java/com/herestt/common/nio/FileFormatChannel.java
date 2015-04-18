@@ -18,30 +18,94 @@ import java.util.Set;
 /**
  * A file channel that allows data conversion.
  * 
+ * <p>This {@link FileChannel} focuses on file formats by allowing
+ * reading/writing sequences of data.</p>
+ * 
+ * <p>By implementing the {@link NativeConvertibleChannel}
+ * interface, this file channel can directly access typed data and 
+ * can wrap signed data into primitive data types regarding the table:
+ * <table border=1 cellpadding=2>
+ * 	<tr>
+ * 		<th>Signed Native Data Type</th>
+ * 		<th>Java Primitive Data Type</th>
+ * 		<th>Reading Method</th>
+ * 		<th>Writing Method</th>
+ * 	</tr>
+ * 	<tr>
+ * 		<td>short</td>
+ * 		<td>int</td>
+ * 		<td>{@link FileFormatChannel#readUShort()}</td>
+ * 		<td>{@link FileFormatChannel#writeUShort()}</td>
+ * 	</tr>
+ * 	<tr>
+ * 		<td>int</td>
+ * 		<td>long</td>
+ * 		<td>{@link FileFormatChannel#readUInt()}</td>
+ * 		<td>{@link FileFormatChannel#writeUInt()}</td>
+ * 	</tr>
+ * </table>
+ * </p>
+ * 
+ * <p>Plus a file format channel can access datat by taking care of 
+ * the {@link ByteOrder}.</p>
+ * 
+ * <p>For other functionalities see the {@link FileChannel} class.</p>
+ * 
  * @author Herestt
  *
  */
-public class FileContentChannel extends FileChannel
-		implements NativeConvertibleChannel<FileContentChannel>, SkippableChannel<FileContentChannel> {
+public class FileFormatChannel extends FileChannel
+		implements NativeConvertibleChannel<FileFormatChannel>, SkippableChannel<FileFormatChannel> {
 	
+	/**	The file channel used for accessing the current file. */
 	private FileChannel channel;
 	
+	/** The order with which data are read. */
 	private ByteOrder order = ByteOrder.BIG_ENDIAN;
 	
-	private FileContentChannel(FileChannel channel) {
+	/**
+	 * Instantiates a new FileContentChannel.
+	 * 
+	 * @param channel the channel to use for accessing the current file.
+	 */
+	private FileFormatChannel(FileChannel channel) {
 		this.channel = channel;
 	}
 	
-	public static FileContentChannel open(Path path, Set<? extends OpenOption> options,
+	/**
+	 * Opens or creates a file, returning a file channel to access the content of 
+	 * a file.
+	 * 
+	 * <p>For more informations look at {@link FileChannel#open(Path, OpenOption...)}.</p>
+	 * 
+	 * @param path - the {@link Path} to the file to access/create.
+	 * @param options - options specifying how the file is opened.
+	 * @param attrs - An optional list of file attributes to set atomically when
+     *          creating the file
+	 * @return a new file content channel.
+	 * @throws IOException - if an I/O error occurs.
+	 */
+	public static FileFormatChannel open(Path path, Set<? extends OpenOption> options,
             FileAttribute<?>... attrs) throws IOException {
 		FileChannel channel = FileChannel.open(path, options, attrs);
-		return new FileContentChannel(channel);
+		return new FileFormatChannel(channel);
 	}
 	
-	 public static FileContentChannel open(Path path, OpenOption... options)
+	/**
+	 * Opens or creates a file, returning a file channel to access the content of 
+	 * a file.
+	 * 
+	 * <p>For more informations look at {@link FileChannel#open(Path, Set, FileAttribute...)}.</p>
+	 * 
+	 * @param path - the {@link Path} to the file to access/create.
+	 * @param options - options specifying how the file is opened.
+	 * @return a new file content channel.
+	 * @throws IOException - if an I/O error occurs.
+	 */
+	 public static FileFormatChannel open(Path path, OpenOption... options)
 		        throws IOException {
 		FileChannel channel = FileChannel.open(path, options);
-		return new FileContentChannel(channel);
+		return new FileFormatChannel(channel);
 	}
 	
 	@Override
@@ -153,7 +217,7 @@ public class FileContentChannel extends FileChannel
 	}
 
 	@Override
-	public FileContentChannel order(ByteOrder order) {
+	public FileFormatChannel order(ByteOrder order) {
 		this.order = order;
 		return this;
 	}
@@ -337,43 +401,43 @@ public class FileContentChannel extends FileChannel
 	}
 
 	@Override
-	public FileContentChannel skip(long count) throws IOException {
+	public FileFormatChannel skip(long count) throws IOException {
 		channel.position(channel.position() + count);
 		return this;
 	}
 
 	@Override
-	public FileContentChannel skipByte() throws IOException {
+	public FileFormatChannel skipByte() throws IOException {
 		skip(Byte.BYTES);
 		return this;
 	}
 
 	@Override
-	public FileContentChannel skipBoolean() throws IOException {
+	public FileFormatChannel skipBoolean() throws IOException {
 		skip(1);
 		return this;
 	}
 
 	@Override
-	public FileContentChannel skipChar() throws IOException {
+	public FileFormatChannel skipChar() throws IOException {
 		skip(Character.BYTES);
 		return this;
 	}
 
 	@Override
-	public FileContentChannel skipInt() throws IOException {
+	public FileFormatChannel skipInt() throws IOException {
 		skip(Integer.BYTES);
 		return this;
 	}
 
 	@Override
-	public FileContentChannel skipLong() throws IOException {
+	public FileFormatChannel skipLong() throws IOException {
 		skip(Long.BYTES);
 		return this;
 	}
 
 	@Override
-	public FileContentChannel skipFloat() throws IOException {
+	public FileFormatChannel skipFloat() throws IOException {
 		skip(Float.BYTES);
 		return this;
 	}
