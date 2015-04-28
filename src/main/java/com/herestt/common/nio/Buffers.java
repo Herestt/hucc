@@ -6,11 +6,18 @@ public class Buffers {
 
 	/*** Byte Data Type Processing. ***/
 	public static short getUnsignedByte(ByteBuffer src) {
-		// TODO - Herestt : implementation.
-		return 0;
+		return getUnsignedByte(src, src.position());
 	}
 	
 	public static void putUnsignedByte(ByteBuffer dst, short value) {
+		// TODO - Herestt : implementation.
+	}
+	
+	public static short getUnsignedByte(ByteBuffer src, int index) {
+		return (short) (src.get(index) & 0xff);
+	}
+	
+	public static void putUnsignedByte(ByteBuffer dst, int index, short value) {
 		// TODO - Herestt : implementation.
 	}
 	
@@ -30,19 +37,9 @@ public class Buffers {
 		// TODO - Herestt : implementation.
 	}
 	
-	public static short getUnsignedByte(ByteBuffer src, int index) {
-		// TODO - Herestt : implementation.
-		return 0;
-	}
-	
-	public static void putUnsignedByte(ByteBuffer dst, int index, short value) {
-		// TODO - Herestt : implementation.
-	}
-	
 	/*** Short Data Type Processing. ***/
 	public static int getUnsignedShort(ByteBuffer src) {
-		// TODO - Herestt : implementation.
-		return 0;
+		return getUnsignedShort(src, src.position());
 	}
 	
 	public static void putUnsignedShort(ByteBuffer dst, int value) {
@@ -50,8 +47,7 @@ public class Buffers {
 	}
 	
 	public static int getUnsignedShort(ByteBuffer src, int index) {
-		// TODO - Herestt : implementation.
-		return 0;
+		return (src.getShort(index) & 0xffff);
 	}
 	
 	public static void putUnsignedShort(ByteBuffer dst, int index, int value) {
@@ -60,8 +56,7 @@ public class Buffers {
 	
 	/*** Integer Data Type Processing. ***/
 	public static long getUnsignedInt(ByteBuffer src) {
-		// TODO - Herestt : implementation.
-		return 0;
+		return getUnsignedInt(src, src.position());
 	}
 	
 	public static void putUnsignedInt(ByteBuffer dst, long value) {
@@ -69,8 +64,7 @@ public class Buffers {
 	}
 	
 	public static long getUnsignedInt(ByteBuffer src, int index) {
-		// TODO - Herestt : implementation.
-		return 0;
+		return (src.getInt(index) & 0xffffffffL);
 	}
 	
 	public static void putUnsignedInt(ByteBuffer dst, int index, long value) {
