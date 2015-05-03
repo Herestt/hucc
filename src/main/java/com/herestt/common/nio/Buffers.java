@@ -36,7 +36,7 @@ public class Buffers {
 	 * @param value - The value to convert. 
 	 */
 	public static void putUnsignedByte(ByteBuffer dst, int value) {
-		// TODO - Herestt : implementation.
+		putUnsignedByte(dst, dst.position(), value);
 	}
 	
 	/**
@@ -62,7 +62,9 @@ public class Buffers {
 	 * @param value - The value to convert. 
 	 */
 	public static void putUnsignedByte(ByteBuffer dst, int index, int value) {
-		// TODO - Herestt : implementation.
+		if(value < 0 || value > 255)
+			throw new IllegalArgumentException("Tha value must belongs to [0, 255].");
+		dst.put(index, (byte) (value & 0xff));
 	}
 	
 	/* Short Data Type Processing. */
@@ -88,7 +90,7 @@ public class Buffers {
 	 * @param value - The value to convert. 
 	 */
 	public static void putUnsignedShort(ByteBuffer dst, int value) {
-		// TODO - Herestt : implementation.
+		putUnsignedShort(dst, dst.position(), value);
 	}
 	
 	/**
@@ -114,7 +116,9 @@ public class Buffers {
 	 * @param value - The value to convert. 
 	 */
 	public static void putUnsignedShort(ByteBuffer dst, int index, int value) {
-		// TODO - Herestt : implementation.
+		if(value < 0 || value > 65535)
+			throw new IllegalArgumentException("Tha value must belongs to [0, 65535].");
+		dst.putShort(index, (short) (value & 0xffff));
 	}
 	
 	/* Integer Data Type Processing. */
@@ -140,7 +144,7 @@ public class Buffers {
 	 * @param value - The value to convert. 
 	 */
 	public static void putUnsignedInt(ByteBuffer dst, long value) {
-		// TODO - Herestt : implementation.
+		putUnsignedInt(dst, dst.position(), value);
 	}
 	
 	/**
@@ -166,6 +170,8 @@ public class Buffers {
 	 * @param value - The value to convert. 
 	 */
 	public static void putUnsignedInt(ByteBuffer dst, int index, long value) {
-		// TODO - Herestt : implementation.
+		if(value < 0 || value > 4294967295L)
+			throw new IllegalArgumentException("Tha value must belongs to [0, 4294967295].");
+		dst.putInt(index, (int) (value & 0xffffffffL));
 	}
 }
