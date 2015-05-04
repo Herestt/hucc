@@ -1,11 +1,15 @@
 package com.herestt.common.imageio.plugins.tga;
 
+import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 import javax.imageio.metadata.IIOInvalidTreeException;
 import javax.imageio.metadata.IIOMetadata;
 
 import org.w3c.dom.Node;
+
+import com.herestt.common.nio.Buffers;
 
 public class TgaMetadata extends IIOMetadata {
 
@@ -13,6 +17,12 @@ public class TgaMetadata extends IIOMetadata {
 	
 	protected static final String nativeMetadataFormatClassName =
 			"com.herestt.common.imageio.plugins.tga.TgaMetadataFormat";
+	
+	public static final int HEADER_SIZE = 18;
+	
+	public static final int FOOTER_SIZE = 26;
+	
+	public static final String FOOTER_SIGNATURE = "TRUEVISION-XFILE.";
 	
 	private Header header;
 	
@@ -25,11 +35,17 @@ public class TgaMetadata extends IIOMetadata {
 	private Footer footer;
 	
 	public TgaMetadata() {
-		// TODO Auto-generated constructor stub
+		super(true,
+				nativeImageMetadataFormatName,
+				nativeMetadataFormatClassName,
+				null, null);
 	}
 	
 	public void setHeader(ByteBuffer data) {
-		// TODO - Herestt : implementation.
+		if(data.capacity() != HEADER_SIZE)
+			throw new IllegalArgumentException("The size of the given chunk is "
+					+ "different from the expected TGA header size.");
+		header = new Header(data);
 	}
 	
 	public void setImage(ByteBuffer imageId,
@@ -48,209 +64,230 @@ public class TgaMetadata extends IIOMetadata {
 	}
 	
 	public void setFooter(ByteBuffer data) {
-		// TODO - Herestt : implementation.
+		if(data.capacity() != FOOTER_SIZE)
+			throw new IllegalArgumentException("The size of the given chunk is "
+					+ "different from the expected TGA header size.");
+		footer = new Footer(data);
 	}
 	
 	/* HEADER CHUNK */
 	private static class Header {
 		
-		public static final int DATA_SIZE = 9;
-		
 		private ByteBuffer data;
 		
 		private Header(ByteBuffer data) {
-			// TODO Auto-generated constructor stub
+			data.order(ByteOrder.LITTLE_ENDIAN);
+			this.data = data;
 		}
 	}
 	
 	public int idLength() {
-		// TODO - Herestt : implementation.
-		return 0;
+		return Buffers.getUnsignedByte(header.data, 0);
 	}
 	
 	public void idLength(int value) {
-		// TODO - Herestt : implementation.
+		Buffers.putUnsignedByte(header.data, 0, value);
 	}
 	
 	public static enum ColorMapType {
 		NO_COLOR_MAP_INCLUDED(0), COLOR_MAP_INCLUDED(1);
 		
+		private int type;
+		
 		ColorMapType(final int type) {
-			// TODO - Herestt : implementation.
+			this.type = type;
 		}
 		
 		public int getColorMapType() {
-			// TODO - Herestt : implementation.
-			return 0;
+			return type;
+		}
+		
+		public static ColorMapType valueOf(int type) {
+			for(ColorMapType cmt : ColorMapType.values()) {
+				if(cmt.getColorMapType() == type)
+					return cmt;
+			}
+			throw new IllegalArgumentException("Unknown TGA color map type.");
 		}
 	}
 	
 	public ColorMapType colorMapType() {
-		// TODO - Herestt : implementation.
-		return null;
+		int type = Buffers.getUnsignedByte(header.data, 1);
+		return ColorMapType.valueOf(type);
 	}
 	
 	public void colorMapType(ColorMapType type) {
-		// TODO - Herestt : implementation.
+		Buffers.putUnsignedByte(header.data, 1, type.getColorMapType());
 	}
 	
 	public static enum ImageType {
 		NO_DATA (0), UNCOMPRESSED_COLOR_MAPPED(1),
-		UNCOMPRESSED_BLACK_AND_WHITE(2), UNCOMPRESSED_TRUE_COLOR(3),
-		RLE_COLOR_MAPPED(9), RLE_BLACK_AND_WHITE(10), RLE_TRUE_COLOR(11);
+		UNCOMPRESSED_TRUE_COLOR(2), UNCOMPRESSED_BLACK_AND_WHITE(3),
+		RLE_COLOR_MAPPED(9), RLE_TRUE_COLOR(10), RLE_BLACK_AND_WHITE(11);
 		
-		ImageType(final int i) {
-			// TODO Auto-generated constructor stub
+		private int type;
+		
+		ImageType(final int type) {
+			this.type = type;
 		}
 		
 		public int getImageType() {
-			// TODO - Herestt : implementation.
-			return 0;
+			return type;
+		}
+		
+		public static ImageType valueOf(int type) {
+			for(ImageType it : ImageType.values()) {
+				if(it.getImageType() == type)
+					return it;
+			}
+			throw new IllegalArgumentException("Unknown TGA image type.");
 		}
 	}
 
 	public ImageType imageType() {
-		// TODO - Herestt : implementation.
-		return null;
+		int type = Buffers.getUnsignedByte(header.data, 2);
+		return ImageType.valueOf(type);
 	}
 	
 	public void imageType(ImageType type) {
-		// TODO - Herestt : implementation.
+		Buffers.putUnsignedByte(header.data, 2, type.getImageType());
 	}
 	
 	// Color Map Specification.
 	public int firstEntryIndex() {
-		// TODO - Herestt : implementation.
-		return 0;
+		return Buffers.getUnsignedShort(header.data, 3);
 	}
 	
 	public void firstEntryIndex(int index) {
-		// TODO - Herestt : implementation.
+		Buffers.putUnsignedShort(header.data, 3, index);
 	}
 	
 	public int colorMapLength() {
-		// TODO - Herestt : implementation.
-		return 0;
+		return Buffers.getUnsignedShort(header.data, 5);
 	}
 	
 	public void colorMapLength(int length) {
-		// TODO - Herestt : implementation.
+		Buffers.putUnsignedShort(header.data, 5, length);
 	}
 	
 	public int colorMapEntrySize() {
-		// TODO - Herestt : implementation.
-		return 0;
+		return Buffers.getUnsignedByte(header.data, 7);
 	}
 	
 	public void colorMapEntrySize(int size) {
-		// TODO - Herestt : implementation.
+		Buffers.putUnsignedByte(header.data, 7, size);
 	}
 	
 	// Image Specification.
 	public int xOrigin() {
-		// TODO - Herestt : implementation.
-		return 0;
+		return Buffers.getUnsignedShort(header.data, 8);
 	}
 	
 	public void xOrigin(int x) {
-		// TODO - Herestt : implementation.
+		Buffers.putUnsignedShort(header.data, 8, x);
 	}
 	
 	public int yOrigin() {
-		// TODO - Herestt : implementation.
-		return 0;
+		return Buffers.getUnsignedShort(header.data, 10);
 	}
 	
 	public void yOrigin(int y) {
-		// TODO - Herestt : implementation.
+		Buffers.putUnsignedShort(header.data, 10, y);
 	}
 	
 	public int imageWidth() {
-		// TODO - Herestt : implementation.
-		return 0;
+		return Buffers.getUnsignedShort(header.data, 12);
 	}
 	
 	public void imageWidth(int width) {
-		// TODO - Herestt : implementation.
+		Buffers.putUnsignedShort(header.data, 12, width);
 	}
 	
 	public int imageHeight() {
-		// TODO - Herestt : implementation.
-		return 0;
+		return Buffers.getUnsignedShort(header.data, 14);
 	}
 	
 	public void imageHeight(int height) {
-		// TODO - Herestt : implementation.
+		Buffers.putUnsignedShort(header.data, 14, height);
 	}
 	
 	public int pixelDepth() {
-		// TODO - Herestt : implementation.
-		return 0;
+		return Buffers.getUnsignedByte(header.data, 16);
 	}
 	
 	public void pixelDepth(int depth) {
-		// TODO - Herestt : implementation.
+		Buffers.putUnsignedByte(header.data, 16, depth);
 	}
 	
 	// Image Descriptor.
 	public int alphaChannelBits() {
-		// TODO - Herestt : implementation.
-		return 0;
+		return Buffers.getBits(header.data, 17, 0x0f);
 	}
 	
 	public void alphaChannelBits(int count) {
-		// TODO - Herestt : implementation.
+		Buffers.putBits(header.data, 17, count, 0x0f);
 	}
 	
 	public static enum ImageOrigin {
-		BOTTOM_LEFT(0x00), BOTTOM_RIGHT(0x01), TOP_LEFT(0x10), TOP_RIGHT(0x11);
+		BOTTOM_LEFT(0), BOTTOM_RIGHT(1), TOP_LEFT(2), TOP_RIGHT(3);
+		
+		private int origin;
 		
 		ImageOrigin(final int origin) {
-			// TODO - Herestt : implementation.
+			this.origin = origin;
 		}
 		
 		public int getImageOrigin() {
-			// TODO - Herestt : implementation.
-			return 0;
+			return origin;
+		}
+		
+		public static ImageOrigin valueOf(int origin) {
+			for(ImageOrigin io : ImageOrigin.values()) {
+				if(io.getImageOrigin() == origin)
+					return io;
+			}
+			throw new IllegalArgumentException("Unknown TGA image origin.");
 		}
 	}
+	
 	public ImageOrigin imageOrigin() {
-		// TODO - Herestt : implementation.
-		return null;
+		int origin = Buffers.getBits(header.data, 17, 0x30);
+		return ImageOrigin.valueOf(origin);
 	}
 	
 	public void imageOrigin(ImageOrigin origin) {
-		// TODO - Herestt : implementation.
+		Buffers.putBits(header.data, 17, origin.getImageOrigin(), 0x30);
 	}
 	
 	/* IMAGE CHUNK */
 	private static class Image {
 		
-		private ByteBuffer imageId;
+		private ByteBuffer id;
 		
 		private ByteBuffer colorMap;
 		
-		private Image(ByteBuffer imageId, ByteBuffer colorMap) {
-			// TODO Auto-generated constructor stub
+		private Image(ByteBuffer id, ByteBuffer colorMap) {
+			id.order(ByteOrder.LITTLE_ENDIAN);
+			colorMap.order(ByteOrder.LITTLE_ENDIAN);
+			this.id = id;
+			this.colorMap = colorMap;
 		}
 	}
 	
 	public ByteBuffer imageId() {
-		// TODO - Herestt : implementation.
-		return null;
+		return image.id;
 	}
 	
 	public void imageId(ByteBuffer id) {
-		// TODO - Herestt : implementation.
+		image.id = id;
 	}
 	
 	public ByteBuffer colorMap() {
-		// TODO - Herestt : implementation.
-		return null;
+		return image.colorMap;
 	}
 	
-	public void colorMap(ByteBuffer map) {
-		// TODO - Herestt : implementation.
+	public void colorMap(ByteBuffer colorMap) {
+		image.colorMap = colorMap;
 	}
 	
 	/* DEVELOPER AREA CHUNK */
@@ -289,42 +326,37 @@ public class TgaMetadata extends IIOMetadata {
 	/* FOOTER CHUNK */
 	private static class Footer {
 		
-		public static final int DATA_SIZE = 9;
-		
-		public static final String SIGNATURE = "TRUEVISION-XFILE";
-		
 		private ByteBuffer data;
 	
 		private Footer(ByteBuffer data) {
-			// TODO Auto-generated constructor stub
+			data.order(ByteOrder.LITTLE_ENDIAN);
+			this.data = data;
 		}
 	}
 	
 	public long extensionAreaOffset() {
-		// TODO Auto-generated constructor stub
-		return 0;
+		return Buffers.getUnsignedInt(footer.data, 0);
 	}
 	
 	public void extensionAreaOffset(long offset) {
-		// TODO Auto-generated constructor stub
+		Buffers.putUnsignedInt(footer.data, 0, offset);
 	}
 	
 	public long developerDirectoryOffset() {
-		// TODO Auto-generated constructor stub
-		return 0;
+		return Buffers.getUnsignedInt(footer.data, 4);
 	}
 	
 	public void developerDirectoryOffset(long offset) {
-		// TODO Auto-generated constructor stub
+		Buffers.putUnsignedInt(footer.data, 4, offset);
 	}
 	
 	public String signature() {
-		// TODO Auto-generated constructor stub
-		return null;
-	}
-	
-	public void signature(String str) {
-		// TODO Auto-generated constructor stub
+		try {
+			return Buffers.getString(footer.data, 8, FOOTER_SIGNATURE.length());
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		return "";
 	}
 	
 	@Override
