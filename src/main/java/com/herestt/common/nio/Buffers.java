@@ -13,6 +13,61 @@ import java.nio.ByteBuffer;
  */
 public class Buffers {
 
+	/* Bits Processing. */
+	
+	/**
+	 * Gets the byte value after applying a mask. The goal of the method
+	 * is to allow reading of specific bits.
+	 * 
+	 * @param src - The {@link ByteBuffer} from which bits will be read.
+	 * @param index - The index from which the value will be read.
+	 * @param mask - The mask to apply on the read byte.
+	 * @return the masked value.
+	 */
+	public static int getBits(ByteBuffer src, int index, int mask) {
+		int value = src.get(index);
+		return (value & mask);
+	}
+	
+	/**
+	 * Gets the byte at the given index and update bits values where the mask bits
+	 * are set.
+	 * 
+	 * <pre><code>
+	 * ByteBuffer dst = ByteBuffer.allocate(1);
+	 * dst.put((byte) 0x11);
+	 * Buffers.putBits(dst, 0, 0x02, 0x03);
+	 * byte b = dst.get(0);		// b == 0x12
+	 * </code></pre>
+	 * 
+	 * @param dst - The {@link ByteBuffer} into which the bits will be written.
+	 * @param index - The index of the byte of which bits will be written.
+	 * @param value - The value to mask before the putting operation.
+	 * @param mask - The mask to apply on the value held within the {@code dst} buffer
+	 * at the given index.
+	 */
+	public static void putBits(ByteBuffer dst, int index, int value, int mask) {
+		if(value < 0 || value > 255)
+			throw new IllegalArgumentException("Tha value must belongs to [0, 255].");
+		byte result = dst.get(index);
+		for(int i = 0; i < Byte.SIZE; i++) {
+			
+			int maskBit = (mask >> i) & 1;
+			if(maskBit == 1) {
+			
+				int valueBit = (value >> i) & 1;
+				byte oneBitMask = (byte) Math.pow(2, i);
+				if(valueBit == 1)
+					result = (byte) (result | oneBitMask); 
+				else {
+					oneBitMask = (byte) ~oneBitMask;
+					result = (byte) (result & oneBitMask);
+				}
+			}
+		}
+		dst.put(index, result);
+	}
+	
 	/* Byte Data Type Processing. */
 	
 	/**
