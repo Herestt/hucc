@@ -99,7 +99,7 @@ public class Buffers {
 	 * byte wrapped in an integer.
 	 *
 	 * @param src - The {@link ByteBuffer} from which the value will be read.
-	 * @param index - The index from which the value will be read.
+	 * @param index - The index where the value will be read.
 	 * @return the converted value.
 	 */
 	public static int getUnsignedByte(ByteBuffer src, int index) {
@@ -113,7 +113,7 @@ public class Buffers {
 	 *
 	 * @param dst - The {@link ByteBuffer} into which the converted
 	 * value will be written.
-	 * @param index - The index from which the value will be read.
+	 * @param index - The index where the value will be written.
 	 * @param value - The value to convert. 
 	 */
 	public static void putUnsignedByte(ByteBuffer dst, int index, int value) {
@@ -153,7 +153,7 @@ public class Buffers {
 	 * short wrapped in an integer.
 	 *
 	 * @param src - The {@link ByteBuffer} from which the value will be read.
-	 * @param index - The index from which the value will be read.
+	 * @param index - The index where the value will be read.
 	 * @return the converted value.
 	 */
 	public static int getUnsignedShort(ByteBuffer src, int index) {
@@ -167,7 +167,7 @@ public class Buffers {
 	 *
 	 * @param dst - The {@link ByteBuffer} into which the converted
 	 * value will be written.
-	 * @param index - The index from which the value will be read.
+	 * @param index - The index where the value will be written.
 	 * @param value - The value to convert. 
 	 */
 	public static void putUnsignedShort(ByteBuffer dst, int index, int value) {
@@ -207,7 +207,7 @@ public class Buffers {
 	 * integer wrapped in an long.
 	 *
 	 * @param src - The {@link ByteBuffer} from which the value will be read.
-	 * @param index - The index from which the value will be read.
+	 * @param index - The index where the value will be read.
 	 * @return the converted value.
 	 */
 	public static long getUnsignedInt(ByteBuffer src, int index) {
@@ -221,7 +221,7 @@ public class Buffers {
 	 *
 	 * @param dst - The {@link ByteBuffer} into which the converted
 	 * value will be written.
-	 * @param index - The index from which the value will be read.
+	 * @param index - The index where the value will be written.
 	 * @param value - The value to convert. 
 	 */
 	public static void putUnsignedInt(ByteBuffer dst, int index, long value) {
