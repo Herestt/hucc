@@ -17,7 +17,14 @@ public class Buffers {
 	
 	/**
 	 * Gets the byte value after applying a mask. The goal of the method
-	 * is to allow reading of specific bits.
+	 * is to allow the reading of specific bits.
+	 * 
+	 * <pre><code>
+	 * ByteBuffer dst = ByteBuffer.allocate(1);
+	 * dst.put((byte) 0xAB); 
+	 * int v = Buffers.getBits(dst, 0, 0xF0);	// v == 0x0A. /!\ Notice that v != 0xA0
+	 * v = Buffers.getBits(dst, 0, 0x0F);		// v == 0x0B
+	 * </code></pre>
 	 * 
 	 * @param src - The {@link ByteBuffer} from which bits will be read.
 	 * @param index - The index from which the value will be read.
@@ -25,7 +32,32 @@ public class Buffers {
 	 * @return the masked value.
 	 */
 	public static int getBits(ByteBuffer src, int index, int mask) {
-		int value = src.get(index);
+		if(mask < 0 || mask > 255)
+			throw new IllegalArgumentException("Tha mask must belongs to [0, 255].");
+		
+		int value = getUnsignedByte(src, index);
+		if((mask & 0xff) == 0)	// IF the eight first bits are equal to 0.
+			return value;
+		boolean hasStarted = false;
+		int startMask = 0, length = 0;
+		for(int i = 0; i < Byte.SIZE; i++) {	// Determine where mask starts, and its length.
+			int b = (mask >> i) & 1;
+			if(b == 0) {
+				if(hasStarted)
+					break;
+				startMask++;
+			}
+			else {
+				hasStarted = true;
+				length++;
+			}
+		}
+		
+		mask = 0;
+		for(int i = 0; i < length; i++)		// Create a mask that starts at the LSB and measures n = length bits long.
+			mask += Math.pow(2, i);
+		
+		value = value >>> startMask;		// Shift the value so that the wanted chunk starts at the LSB.
 		return (value & mask);
 	}
 	
@@ -47,25 +79,30 @@ public class Buffers {
 	 * at the given index.
 	 */
 	public static void putBits(ByteBuffer dst, int index, int value, int mask) {
-		if(value < 0 || value > 255)
-			throw new IllegalArgumentException("Tha value must belongs to [0, 255].");
-		byte result = dst.get(index);
-		for(int i = 0; i < Byte.SIZE; i++) {
-			
-			int maskBit = (mask >> i) & 1;
-			if(maskBit == 1) {
-			
-				int valueBit = (value >> i) & 1;
-				byte oneBitMask = (byte) Math.pow(2, i);
-				if(valueBit == 1)
-					result = (byte) (result | oneBitMask); 
-				else {
-					oneBitMask = (byte) ~oneBitMask;
-					result = (byte) (result & oneBitMask);
-				}
-			}
-		}
-		dst.put(index, result);
+		throw new UnsupportedOperationException("Not implemented yet.");
+//		if(value < 0 || value > 255)
+//			throw new IllegalArgumentException("Tha value must belongs to [0, 255].");
+//		if(mask == 0)
+//			putUnsignedByte(dst, index, value);
+//		
+//		int result = getUnsignedByte(dst, index);
+//		
+//		for(int i = 0; i < Byte.SIZE; i++) {
+//			
+//			int maskBit = (mask >> i) & 1;
+//			if(maskBit == 1) {
+//			
+//				int valueBit = (value >> i) & 1;
+//				byte oneBitMask = (byte) Math.pow(2, i);
+//				if(valueBit == 1)
+//					result = (byte) (result | oneBitMask); 
+//				else {
+//					oneBitMask = (byte) ~oneBitMask;
+//					result = (byte) (result & oneBitMask);
+//				}
+//			}
+//		}
+//		putUnsignedByte(dst, index, result);
 	}
 	
 	/* Byte Data Type Processing. */
