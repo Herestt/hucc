@@ -1,6 +1,9 @@
 package com.herestt.common.nio;
 
+import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.charset.Charset;
 
 /**
  * An utility class for interacting with {@link ByteBuffer} containers.
@@ -265,5 +268,67 @@ public class Buffers {
 		if(value < 0 || value > 4294967295L)
 			throw new IllegalArgumentException("Tha value must belongs to [0, 4294967295].");
 		dst.putInt(index, (int) (value & 0xffffffffL));
+	}
+	
+	/* String Processing. */
+	
+	/**
+	 * Gets the next bytes at the current position then convert them into an
+	 * {@code UTF-8} {@link String}.
+	 *
+	 * @param src - The {@link ByteBuffer} from which the value will be read.
+	 * @param length - The length of the {@code String} to read.
+	 *
+	 * @return the read {@code String}.
+	 * 
+	 * @throws UnsupportedEncodingException if the {@code String} is not {@code UTF-8}.
+	 */
+	public static String getString(ByteBuffer src, int length) throws UnsupportedEncodingException {
+		return getString(src, src.position(), length);
+	}
+	
+	/**
+	 * Puts an {@code UTF-8} {@link String} at the current position. 
+	 * 
+	 * @param dst - The {@link ByteBuffer} into which the value will be written.
+	 * @param str - The {@code String} to put into.
+	 */
+	public static void putString(ByteBuffer dst, String str) {
+		putString(dst, dst.position(), str);
+	}
+	
+	/**
+	 * Gets the next bytes at the given position then convert them into an
+	 * {@code UTF-8} {@link String}.
+	 *
+	 * @param src - The {@link ByteBuffer} from which the value will be read.
+	 * @param index - The index where the {@code String} will be read.
+	 * @param length - The length of the {@code String} to read.
+	 *
+	 * @return the gotten {@code String}.
+	 * 
+	 * @throws UnsupportedEncodingException if the {@code String} is not {@code UTF-8}.
+	 */
+	public static String getString(ByteBuffer src, int index, int length) throws UnsupportedEncodingException {
+		byte[] dst = new byte[length];
+		src.position(index);
+		src.get(dst);
+		return new String(dst).trim();
+	}
+	
+	/**
+	 * Puts the next bytes at the given position into an {@code UTF-8}
+	 * {@link String}. 
+	 * 
+	 * @param dst - The {@link ByteBuffer} into which the value will be written.
+	 * @param index - The index where the {@code String} will be written.
+	 * @param str - The {@code String} to put into.
+	 */
+	public static void putString(ByteBuffer dst, int index, String str) {
+		dst.position(index);
+		ByteOrder oldOrder = dst.order();
+		dst.order(ByteOrder.BIG_ENDIAN);
+		dst.put(str.getBytes());
+		dst.order(oldOrder);
 	}
 }
