@@ -30,6 +30,8 @@ public class TgaImageReaderSpi extends ImageReaderSpi {
 	
 	private static final String signature = "TRUEVISION-XFILE";
 	
+	private ImageInputStream stream;
+	
 	public TgaImageReaderSpi() {
 		super(vendorName,
 				version,
@@ -57,15 +59,19 @@ public class TgaImageReaderSpi extends ImageReaderSpi {
 		long pos = stream.length() - 17 - 1;	// Signature starting offset.
 		stream.seek(pos);
 		stream.readFully(signatureBytes);
-		if(new String(signatureBytes).equals(signature))
+		if(new String(signatureBytes).equals(signature)) {
+			this.stream = stream;
 			return true;
+		}
 		return false;
 	}
 
 	@Override
 	public ImageReader createReaderInstance(Object extension)
 			throws IOException {
-		return new TgaImageReader(this);
+		ImageReader reader = new TgaImageReader(this);
+		reader.setInput(stream);
+		return reader;
 	}
 
 	@Override
